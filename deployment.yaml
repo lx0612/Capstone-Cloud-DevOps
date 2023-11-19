@@ -1,0 +1,37 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: udacity-pj-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: uda-app
+    tier: uda-web
+  template:
+    metadata:
+      labels:
+        app: uda-app
+    tier: uda-web
+    spec:
+      containers:
+        - name: capstone-clouddevops-container
+          image: lx0612/capstone-clouddevops:lastest
+          ports:
+            - containerPort: 5000
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: uda-pj
+spec:
+  selector:
+    app: uda-app
+    tier: uda-web
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 5000
+  type: LoadBalancer
