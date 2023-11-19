@@ -179,7 +179,7 @@ jobs:
       # Export environment variable
       - export
       - aws-eks/update-kubeconfig-with-authenticator:
-          cluster-name: mlops-cluster-$CUR_SHORT_HASH
+          cluster-name: cluster-app-$CUR_SHORT_HASH
           install-kubectl: true
       - kubernetes/create-or-update-resource:
           get-rollout-status: true

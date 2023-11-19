@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: capstone-clouddevops-container
-          image: lx0612/capstone-clouddevops:lastest
+          image: lx96/flask_service:lastest
           ports:
             - containerPort: 5000
 
