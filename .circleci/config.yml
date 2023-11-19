@@ -145,7 +145,6 @@ jobs:
           kubectl-version: v1.22.0
       - aws-eks/create-cluster:
           cluster-name: cluster-app-$CUR_SHORT_HASH
-          region: "us-east-1"
           zones: "us-east-1a,us-east-1b"
           node-type: "t3.medium"
           nodegroup-name: "node-eks"
