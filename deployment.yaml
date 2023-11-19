@@ -8,12 +8,12 @@ spec:
   selector:
     matchLabels:
       app: uda-app
-    tier: uda-web
+      tier: uda-web
   template:
     metadata:
       labels:
         app: uda-app
-    tier: uda-web
+        tier: uda-web
     spec:
       containers:
         - name: capstone-clouddevops-container
