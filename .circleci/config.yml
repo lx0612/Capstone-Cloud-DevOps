@@ -20,7 +20,7 @@ commands:
           name: "Export environment variable"
           command: |
             echo 'export WORKSPACE_DIR="/home/circleci/workspace"' >> "$BASH_ENV"
-            echo 'export PROJECT_ROOT_DIR="capstone-project"' >> "$BASH_ENV"
+
 
   destroy_environment:
     parameters:
@@ -81,7 +81,7 @@ jobs:
 
     environment:
       # Set the DOCKERHUB_USERNAME environment variable for pushing the image to Docker Hub
-      DOCKERHUB_USERNAME: lx0612
+      DOCKERHUB_USERNAME: lx96
       IMAGE_NAME: flask_service
       IMAGE_TAG: latest
 
@@ -96,14 +96,16 @@ jobs:
       # Download and cache dependencies
       - restore_cache:
           keys:
-          - new-dependencies-{{ checksum "capstone-project/requirements.txt" }}
+          - new-dependencies-{{ checksum "requirements.txt" }}
           # fallback to using the latest cache if no exact match is found
           - dependencies-
 
       - run:
           name: Install dependencies
           command: |
-            cd $(eval echo "$CIRCLE_WORKING_DIRECTORY/$PROJECT_ROOT_DIR")
+            ls
+            pwd
+            cd $(eval echo "$CIRCLE_WORKING_DIRECTORY")
             python3 -m venv venv
             . venv/bin/activate
             pip install --upgrade pip
@@ -111,30 +113,26 @@ jobs:
 
       - save_cache:
           paths:
-            - /home/circleci/project/capstone-project/venv
-          key: new-dependencies-{{ checksum "capstone-project/requirements.txt" }}
+            - /home/circleci/project/venv
+          key: new-dependencies-{{ checksum "requirements.txt" }}
 
       - run:
           name: Run lint
           command: |
-            cd $(eval echo "$CIRCLE_WORKING_DIRECTORY/$PROJECT_ROOT_DIR")
+            cd $(eval echo "$CIRCLE_WORKING_DIRECTORY")
             . venv/bin/activate
-            pylint service.py --disable=R,C,W1203,W1202,unsubscriptable-object,no-name-in-module  
+            pylint main.py --disable=R,C,W1203,W1202,unsubscriptable-object,no-name-in-module  
 
+      - run: 
+          name: Build image
+          command: |
+            echo "$DOCKERHUB_PASSWORD" | docker login --username $DOCKERHUB_USERNAME --password-stdin
+            docker build -t $IMAGE_NAME:$IMAGE_TAG .
       - run:
-          name: Login to Docker Hub
+          name: Push to Docker Hub
           command: |
             # Log in to Docker Hub
-            docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
-            
-      - run: 
-          name: Add tag to image
-          command: |
-            docker image tag $IMAGE_NAME:oqlrrpbfhkrraaav $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG
-
-      - run:
-          name: Push the image to Docker Hub
-          command: |
+            docker tag $IMAGE_NAME $DOCKERHUB_USERNAME/$IMAGE_NAME
             docker push $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG
 
   create-cluster-eks:
@@ -147,6 +145,7 @@ jobs:
           kubectl-version: v1.22.0
       - aws-eks/create-cluster:
           cluster-name: cluster-app-$CUR_SHORT_HASH
+          region: "us-east-1"
           zones: "us-east-1a,us-east-1b"
           node-type: "t3.medium"
           nodegroup-name: "node-eks"
@@ -186,7 +185,7 @@ jobs:
       - kubernetes/create-or-update-resource:
           get-rollout-status: true
           watch-rollout-status: true
-          resource-file-path: $PROJECT_ROOT_DIR/deployment.yaml
+          resource-file-path: deployment.yaml
           resource-name: deployment/app-deployment
           show-kubectl-command: true
       - run:

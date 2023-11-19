@@ -1,4 +1,3 @@
-import os
 from flask import Flask, render_template
 
 app = Flask("application", static_folder='static', template_folder="templates")
@@ -9,7 +8,8 @@ def myUdacity():
 
 if __name__ == '__main__':
     app.run(
-        host=os.getenv('FLASK_IP', '0.0.0.0'),
-        port=os.getenv('FLASK_PORT', 5000),
-        debug=bool(os.getenv('FLASK_DEBUG', True))
+        host= '0.0.0.0',
+        port= 5000,
+        debug= True
     )
+    
