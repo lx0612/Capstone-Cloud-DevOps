@@ -185,7 +185,7 @@ jobs:
           get-rollout-status: true
           watch-rollout-status: true
           resource-file-path: deployment.yaml
-          resource-name: deployment/app-deployment
+          resource-name: deployment/udacity-pj-deployment
           show-kubectl-command: true
       - run:
           name: Check status when deployment fail
